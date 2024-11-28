@@ -28,14 +28,15 @@ RAM_SIZE_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
 # Convert RAM size to sectors (1 sector = 512 bytes)
 SWAP_SIZE_SECTORS=$((RAM_SIZE_KB * 1024 / 2 / 512))
 
-# Create a new partition table
-echo "label: dos" | sfdisk $SFDISK_OPTS $DISK
+# Create a new partition table (GPT)
+echo "label: gpt" | sfdisk $SFDISK_OPTS $DISK
 
-# Create the swap partition (type 82)
-echo "start=2048, size=$SWAP_SIZE_SECTORS, type=82" | sfdisk $SFDISK_OPTS $DISK
-
-# Create the primary partition (type 83) using the remaining space
-echo "type=83" | sfdisk --append $SFDISK_OPTS $DISK
+# Create the UEFI partition
+echo "start=2048, size=1G, type=uefi" | sfdisk $SFDISK_OPTS $DISK
+# Create swap partition
+echo "size=$SWAP_SIZE_SECTORS, type=swap" | sfdisk --append $SFDISK_OPTS $DISK
+# Create the primary linux partition using the remaining space
+echo "type=linux" | sfdisk --append $SFDISK_OPTS $DISK
 
 # Verify the partition table
 sfdisk -l $DISK
