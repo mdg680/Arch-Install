@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# Script to create a partitiontable using sfdisk
+
+# Check if the disk device and mode (dummy or not) parameters are provided
+if [ $# -lt 2 ]; then
+  echo "Usage: $0 <disk-device> <mode>"
+  echo "Modes: --dummy for a dummy run, --execute for actual execution"
+  exit 1
+fi
+
+# Define the disk device and mode from the script arguments
+DISK=$1
+MODE=$2
+
+# Determine the sfdisk command options based on the mode
+if [ "$MODE" = "--dummy" ]; then
+  SFDISK_OPTS="--no-act"
+elif [ "$MODE" = "--execute" ]; then
+  SFDISK_OPTS=""
+else
+  echo "Invalid mode. Use --dummy for a dummy run or --execute for actual execution."
+  exit 1
+fi
+
+# Get the total RAM size in kB
+RAM_SIZE_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+# Convert RAM size to sectors (1 sector = 512 bytes)
+SWAP_SIZE_SECTORS=$((RAM_SIZE_KB * 1024 / 2 / 512))
+
+# Create a new partition table
+echo "label: dos" | sfdisk $SFDISK_OPTS $DISK
+
+# Create the swap partition (type 82)
+echo "start=2048, size=$SWAP_SIZE_SECTORS, type=82" | sfdisk $SFDISK_OPTS $DISK
+
+# Create the primary partition (type 83) using the remaining space
+echo "type=83" | sfdisk --append $SFDISK_OPTS $DISK
+
+# Verify the partition table
+sfdisk -l $DISK
+ 
