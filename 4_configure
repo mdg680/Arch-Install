@@ -1,0 +1,18 @@
+# Generate fstab
+genfstab -U /mnt >> /mnt/etc/fstab
+
+# Chroot
+arch-chroot /mnt
+
+# Time
+ln -sf /usr/share/zoneinfo/Europe/Copenhagen # To-Do: set using parameter
+hwclock --systohc
+
+# Localization
+sed -i 's/^LANG=.*/LANG=en_US.UTF-8/' /etc/locale.conf
+sed -i 's/^KEYMAP=.*/KEYMAP=dk-latin1/' /etc/vconsole.conf
+
+echo 'arch-box' >> /etc/hostname # To-Do: make parameter
+
+echo "Set root password to continue!"
+passwd # prompt for root password
