@@ -1,0 +1,4 @@
+# Make swap on swap partiton
+mkswap $(sfdisk -l | awk '$6 == "82" {print $1}')
+# Format main Linux disk to ext4
+mkfs.ext4 $(sfdisk -l | awk '$6 == "83" {print $1}')

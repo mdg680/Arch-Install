@@ -40,6 +40,3 @@ echo "type=83" | sfdisk --append $SFDISK_OPTS $DISK
 # Verify the partition table
 sfdisk -l $DISK
 
-#make swap on swap partition
-mkswap $(sfdisk -l | awk '$6 == "82" {print $1}')
-mkfs.ext4 $(sfdisk -l | awk '$6 == "83" {print $1}')
