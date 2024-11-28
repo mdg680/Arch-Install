@@ -1,9 +1,11 @@
 # Mount primaty ext4 partition
-mount $(sfdisk -l | awk '$6 == "83" {print $1}') /mnt
-mount --mkdir /mnt/boot
+mount $(sfdisk -l | awk '$6" "$7 == "Linux filesystem" {print $1}') /mnt
+
+# Mount EFI
+mount --mkdir $(sfdisk -l | awk '$6 == "EFI" {print $1}') /boot
 
 #Activate swap
-swapon $(sfdisk -l | awk '$6 == "82" {print $1}')
+swapon $(sfdisk -l | awk '$6" "$7 == "Linux swap" {print $1}')
 
 # Install on mounted linux partition
 pacstrap -K /mnt base linux linux-firmware

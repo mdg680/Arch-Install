@@ -1,4 +1,6 @@
+# Format EFI boot partition
+mkfs.fat -F 32 $(sfdisk -l | awk '$6 == "EFI" {print $1}')
 # Make swap on swap partiton
-mkswap $(sfdisk -l | awk '$6 == "82" {print $1}')
+mkswap $(sfdisk -l | awk '$6" "$7 == "Linux swap" {print $1}')
 # Format main Linux disk to ext4
-mkfs.ext4 $(sfdisk -l | awk '$6 == "83" {print $1}')
+mkfs.ext4 $(sfdisk -l | awk '$6" "$7 == "Linux filesystem" {print $1}')
